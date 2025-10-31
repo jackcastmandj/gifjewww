@@ -212,6 +212,7 @@
   const closeModal = document.getElementById('closeModal');
 
   yesBtn.addEventListener('click', async (e) => {
+    startMusic(); // บังคับเปิดเพลง
     yesBtn.style.transition = 'transform .36s cubic-bezier(.2,.9,.3,1), box-shadow .36s';
     yesBtn.style.transform = 'scale(1.45) translateY(-6px)';
     yesBtn.style.boxShadow = '0 20px 40px rgba(255,102,140,0.28)';
@@ -231,6 +232,7 @@
 
   // --- no button warp ---
   noBtn.addEventListener('click', async (e) => {
+    startMusic(); // บังคับเปิดเพลง
     noBtn.animate([{ transform:'translateX(0)' }, { transform:'translateX(-12px)' }, { transform:'translateX(12px)' }, { transform:'translateX(0)' }], { duration:280, easing:'ease-out' });
     const card = document.getElementById('card');
     const cardRect = card.getBoundingClientRect();
@@ -263,8 +265,30 @@
   const toggleMusic = document.getElementById('toggleMusic');
   const musicStatus = document.getElementById('musicStatus');
 
+  // บังคับเปิดเพลงเมื่อมีการคลิกหรือโต้ตอบครั้งแรก
+  let musicStarted = false;
+  function startMusic() {
+    if (!musicStarted) {
+      music.play().then(() => {
+        musicStatus.textContent = 'เพลง: กำลังเล่น';
+        musicStarted = true;
+      }).catch(() => {
+        musicStatus.textContent = 'เพลง: คลิกเพื่อเล่น';
+      });
+    }
+  }
+
+  // พยายามเปิดเพลงทันทีที่โหลดหน้า
+  document.addEventListener('DOMContentLoaded', startMusic);
+  setTimeout(startMusic, 100);
+
+  // บังคับเปิดเพลงเมื่อมีการโต้ตอบใดๆ
+  document.body.addEventListener('click', startMusic, { once: true });
+  document.body.addEventListener('touchstart', startMusic, { once: true });
+
   let musicPlaying = true;
   toggleMusic.addEventListener('click', () => {
+    startMusic(); // ลองเปิดก่อน
     if (music.paused) {
       music.play();
       musicStatus.textContent = 'เพลง: กำลังเล่น';
